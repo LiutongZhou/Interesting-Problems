@@ -29,7 +29,7 @@ beq=sparse(m,1);
 [S,~,deltaT]=fminimax(maxgoal,S0,A,b',Aeq,beq,lb,ub);%,@(S)con2(S,index));
 TotalTime=sum([dt,deltaT]);
 end
-%
+% 
 % function [c,ceq]=con2(S,index)
 % %% con2 is a function that sets equality constraint as shown in constraint 2
 % c=[];ceq=[];
