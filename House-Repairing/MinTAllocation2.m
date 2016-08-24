@@ -4,27 +4,27 @@ function [S,TotalTime]= MinTAllocation2(X,D,M,R)
 % M is a labor capacity constarint row vector, R is a ready row vector.
 % Output Parameters: [S,TotalTime]
 [u,~,index]=unique([R,0]);index(end)=[];
-dt=diff(u);%æ¯ä¸€ä¸ªé˜¶æ®µçš„å·¥æ—¶
+dt=diff(u);%Ã¿Ò»¸ö½×¶ÎµÄ¹¤Ê±
 n=length(D);r=length(dt);
 S=zeros(n,r+1);D=D';M=M';
 for i=1:r
-    ind=D>0&index<=i;%ind ä¸ºå¯ä»¥åŠ¨å·¥çš„å­ä»»åŠ¡çš„ç´¢å¼•
+    ind=D>0&index<=i;%ind Îª¿ÉÒÔ¶¯¹¤µÄ×ÓÈÎÎñµÄË÷Òı
     S(ind,i)=D(ind)/sum(D(ind))*X;
-    ind2=S(:,i)>M;%è¶…å‡ºéƒ¨åˆ†çš„ç´¢å¼•
-    while any(ind2)&&any(ind&S(:,i)<M)%è‹¥æœ‰è¶…å‡ºMä¸”å¯ä»¥æŠŠè¶…å‡ºéƒ¨åˆ†è¿›è¡Œè°ƒåº¦åˆ°æœªè¶…å‡ºéƒ¨åˆ†
-    residual=sum(S(ind2,i)-M(ind2));%å‰©ä½™åŠ³åŠ¨åŠ›
-    S(ind2,i)=M(ind2);%é‡ç½®è¶…å‡ºéƒ¨åˆ†æ»¡è¶³capacityçº¦æŸ
-    ind3=ind&S(:,i)<M;%ind3ä¸º å¯ä»¥åŠ¨å·¥çš„äººå‘˜æœªæ»¡éƒ¨åˆ†çš„ç´¢å¼•
-    S(ind3,i)=S(ind3,i)+D(ind3)/sum(D(ind3))*residual;%å‰©ä½™åŠ³åŠ›åˆ†é…åˆ°äººå‘˜æœªæ»¡éƒ¨åˆ†
-    ind2=S(:,i)>M;%è¶…å‡ºéƒ¨åˆ†çš„ç´¢å¼•
+    ind2=S(:,i)>M;%³¬³ö²¿·ÖµÄË÷Òı
+    while any(ind2)&&any(ind&S(:,i)<M)%ÈôÓĞ³¬³öMÇÒ¿ÉÒÔ°Ñ³¬³ö²¿·Ö½øĞĞµ÷¶Èµ½Î´³¬³ö²¿·Ö
+    residual=sum(S(ind2,i)-M(ind2));%Ê£ÓàÀÍ¶¯Á¦
+    S(ind2,i)=M(ind2);%ÖØÖÃ³¬³ö²¿·ÖÂú×ãcapacityÔ¼Êø
+    ind3=ind&S(:,i)<M;%ind3Îª ¿ÉÒÔ¶¯¹¤µÄÈËÔ±Î´Âú²¿·ÖµÄË÷Òı
+    S(ind3,i)=S(ind3,i)+D(ind3)/sum(D(ind3))*residual;%Ê£ÓàÀÍÁ¦·ÖÅäµ½ÈËÔ±Î´Âú²¿·Ö
+    ind2=S(:,i)>M;%³¬³ö²¿·ÖµÄË÷Òı
     end
-    %è‹¥æœ‰è¶…å‡ºéƒ¨åˆ†ï¼Œä½†æ‰€æœ‰ä»»åŠ¡äººæ‰‹å·²æ»¡ï¼Œåˆ™é‡ç½®ï¼Œä½¿æ»¡è¶³Mçº¦æŸ
+    %ÈôÓĞ³¬³ö²¿·Ö£¬µ«ËùÓĞÈÎÎñÈËÊÖÒÑÂú£¬ÔòÖØÖÃ£¬Ê¹Âú×ãMÔ¼Êø
     S(ind2,i)=M(ind2);
     D=D-S(:,i)*dt(i);
     D(D<0)=0;
 end
-S(:,r+1)=D/sum(D)*X;%è‹¥ä¸è¶…è¿‡M
-S(S(:,r+1)>M,r+1)=M(S(:,r+1)>M); %è‹¥è¶…è¿‡M
+S(:,r+1)=D/sum(D)*X;%Èô²»³¬¹ıM
+S(S(:,r+1)>M,r+1)=M(S(:,r+1)>M); %Èô³¬¹ıM
 deltaT=max(D./S(:,r+1));
 TotalTime=sum([dt,deltaT]);
 end
