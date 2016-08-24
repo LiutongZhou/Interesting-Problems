@@ -22,22 +22,10 @@ for i=1:z
     sub(j:j+index(list(i))-1-1,2)=1:index(list(i))-1;
     sub(j:j+index(list(i))-1-1,1)=list(i);
     j=j+index(list(i))-1;
-end% sub ´æ´¢ÁË constraint 2 ÖĞSµÄÏÂ±ê
+end% sub å­˜å‚¨äº† constraint 2 ä¸­Sçš„ä¸‹æ ‡
 j=sub2ind(size(S0), sub(:,1), sub(:,2));
 Aeq=sparse(1:m,j,ones(m,1),m,n*(r+1));
 beq=sparse(m,1);
-[S,~,deltaT]=fminimax(maxgoal,S0,A,b',Aeq,beq,lb,ub);%,@(S)con2(S,index));
+[S,~,deltaT]=fminimax(maxgoal,S0,A,b',Aeq,beq,lb,ub);
 TotalTime=sum([dt,deltaT]);
 end
-% 
-% function [c,ceq]=con2(S,index)
-% %% con2 is a function that sets equality constraint as shown in constraint 2
-% c=[];ceq=[];
-% j=0;
-% list=find( index>1);
-% n=length(list);
-% for i=1:n
-%     ceq(j+1:j+index(list(i))-1)=S(list(i),1:index(list(i))-1);
-%     j=j+index(list(i))-1;
-% end
-% end
