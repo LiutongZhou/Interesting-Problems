@@ -26,11 +26,10 @@ end% sub 存储了 constraint 2 中S的下标
 j=sub2ind(size(S0), sub(:,1), sub(:,2));
 Aeq=sparse(1:m,j,ones(m,1),m,n*(r+1));
 beq=sparse(m,1);
-
 [S,~,deltaT]=fminimax(maxgoal,S0,A,b',Aeq,beq,lb,ub);%,@(S)con2(S,index));
 TotalTime=sum([dt,deltaT]);
 end
-% 
+%
 % function [c,ceq]=con2(S,index)
 % %% con2 is a function that sets equality constraint as shown in constraint 2
 % c=[];ceq=[];
