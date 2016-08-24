@@ -22,7 +22,7 @@ for i=1:z
     sub(j:j+index(list(i))-1-1,2)=1:index(list(i))-1;
     sub(j:j+index(list(i))-1-1,1)=list(i);
     j=j+index(list(i))-1;
-end% sub 存储了 constraint 2 中S的下标
+end% sub 存储了 constraint 2 中S的下标 
 j=sub2ind(size(S0), sub(:,1), sub(:,2));
 Aeq=sparse(1:m,j,ones(m,1),m,n*(r+1));
 beq=sparse(m,1);
