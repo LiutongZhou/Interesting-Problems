@@ -3,9 +3,9 @@ function VisualPlan(X,D,M,R)
 [n,~]=size(S);
 u=unique([R,0]);
 dt=diff(u);
-figure;ax1=axes('YDir','reverse','YTick',1:n);
+figure;ax1=axes('YDir','reverse','YTick',1:n); 
 hold on;yticklabels=cell(1,n);
-annotation('textbox',[0.15 0.92 0 0],'String',['Total time: ',num2str(T,'%.2f'),' days'],'FitBoxToText','on','FontSize',8,'EdgeColor','w','Margin',0);
+annotation('textbox',[0.15 0.92 0 0],'String',['Total Duration: ',num2str(T,'%.2f'),' days'],'FitBoxToText','on','FontSize',8,'EdgeColor','w','Margin',0);
 for  i=1:n
     list=find(S(i,:)>0);%u(list(end)) is the start time point of the last time interval
     preinterval=1:list(end)-1;
@@ -18,9 +18,9 @@ for  i=1:n
             u(list(end))+DeltaT];
     end
     y=i*ones(size(x));
-    plot(x,y,'LineWidth',8);
-    text(mean(x),mean(y)+0.3,cellstr(num2str(S(i,list)','%.2f')),'HorizontalAlignment','center','FontSize',8);
-    text(T/2,i-0.3,'workers','HorizontalAlignment','center','FontSize',8);
+    plot(x,y,'LineWidth',10);
+    text(mean(x),mean(y),cellstr(num2str(S(i,list)','%.1f')),'HorizontalAlignment','center','FontSize',8,'FontWeight','bold');
+    text((x(1,1)+x(end,end))/2,i-0.3,'workers','HorizontalAlignment','center','FontSize',8,'Clipping','on');
     yticklabels{i}=['Task ',num2str(i)];
 end
 ax1.YTickLabel=yticklabels;
