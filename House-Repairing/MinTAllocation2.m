@@ -12,11 +12,11 @@ for i=1:r%对于前r个有预热的阶段
     S(ind,i)=D(ind)/sum(D(ind))*X;%把labor按比例分配到可以动工的任务中去
     ind2=S(:,i)>M;%人力分配超出capacity约束部分的索引
     while any(ind2)&&any(ind&S(:,i)<M)%若有超出M的人力且存在人手未满的任务
-    residual=sum(S(ind2,i)-M(ind2));%剩余劳动力
-    S(ind2,i)=M(ind2);%重置超出部分满足capacity约束
-    ind3=ind&S(:,i)<M;%ind3为 可以动工的人员未满部分的索引
-    S(ind3,i)=S(ind3,i)+D(ind3)/sum(D(ind3))*residual;%剩余劳力分配到人员未满部分
-    ind2=S(:,i)>M;%更新超出capacity部分的索引
+        residual=sum(S(ind2,i)-M(ind2));%剩余劳动力
+        S(ind2,i)=M(ind2);%重置超出部分满足capacity约束
+        ind3=ind&S(:,i)<M;%ind3为 可以动工的人员未满部分的索引
+        S(ind3,i)=S(ind3,i)+D(ind3)/sum(D(ind3))*residual;%剩余劳力分配到人员未满部分
+        ind2=S(:,i)>M;%更新超出capacity部分的索引
     end%迭代至所有任务不超出capacity或者有超出 但所有任务人手已满，则分配结束
     S(ind2,i)=M(ind2);    %若有超出部分，但所有任务人手已满，则重置，使满足M约束
     D=D-S(:,i)*dt(i);%进行做工
