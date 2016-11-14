@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>An Evacuation Plan for San Francisco by LiutongZhou</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">An Evacuation Plan for San Francisco</h1>
+      <h2 class="project-tagline">Modeled as an Integer Programming Problem</h2>
+      <a href="https://github.com/LiutongZhou/An-Evacuation-Tra-c-Management-Problem" class="btn">View on GitHub</a>
+      <a href="https://github.com/LiutongZhou/An-Evacuation-Tra-c-Management-Problem/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/LiutongZhou/An-Evacuation-Tra-c-Management-Problem/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h2>
+<a id="problem-discription" class="anchor" href="#problem-discription" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Problem Discription</h2>
+
+<p><a href="https://liutongzhou.github.io/Interesting-Problems/An-Evacuation-Traffic-Management-Problem/Problem_Discription.pdf">Problem Discription</a></p>
+
+<h2>
+<a id="finding-the-optimal-plan" class="anchor" href="#finding-the-optimal-plan" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Finding the Optimal Plan</h2>
+
+<h3>
+<a id="constructing-the-traffic-network-graph" class="anchor" href="#constructing-the-traffic-network-graph" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Constructing the Traffic Network (Graph)</h3>
+
+<div class="highlight highlight-source-matlab"><pre><span class="pl-c">%% Import Data</span>
+opts=detectImportOptions(<span class="pl-s"><span class="pl-pds">'</span>Data.xlsx<span class="pl-pds">'</span></span>,<span class="pl-s"><span class="pl-pds">'</span>Sheet<span class="pl-pds">'</span></span>,<span class="pl-s"><span class="pl-pds">'</span>Traffic Link<span class="pl-pds">'</span></span>);
+linkdata=readtable(<span class="pl-s"><span class="pl-pds">'</span>Data.xlsx<span class="pl-pds">'</span></span>,opts);
+opts=detectImportOptions(<span class="pl-s"><span class="pl-pds">'</span>Data.xlsx<span class="pl-pds">'</span></span>,<span class="pl-s"><span class="pl-pds">'</span>Sheet<span class="pl-pds">'</span></span>,<span class="pl-s"><span class="pl-pds">'</span>Traffic Node<span class="pl-pds">'</span></span>);
+nodedata=readtable(<span class="pl-s"><span class="pl-pds">'</span>Data.xlsx<span class="pl-pds">'</span></span>,opts);
+<span class="pl-c">%% Construct Traffic Network (Bi-directional Graph)</span>
+EdgeTable=table;NodeTable=table;
+EdgeTable.EndNodes = <span class="pl-k">str2num</span>(<span class="pl-k">char</span>(linkdata.Link))+<span class="pl-c1">1</span>;
+EdgeTable.Link_Name=<span class="pl-k">strcat</span>(<span class="pl-s"><span class="pl-pds">'</span>l_<span class="pl-pds">'</span></span>,replace(linkdata.Link,<span class="pl-s"><span class="pl-pds">'</span>,<span class="pl-pds">'</span></span>,<span class="pl-s"><span class="pl-pds">'</span>_<span class="pl-pds">'</span></span>));
+NodeTable.Name=<span class="pl-k">cellstr</span>(<span class="pl-k">num2str</span>(nodedata.Node));
+G = digraph(EdgeTable,NodeTable);
+<span class="pl-c">%% output Incidence Matrix to Excel</span>
+<span class="pl-k">xlswrite</span>(<span class="pl-s"><span class="pl-pds">'</span>Data.xlsx<span class="pl-pds">'</span></span>,incidence(G),<span class="pl-s"><span class="pl-pds">'</span>Incidence Matrix<span class="pl-pds">'</span></span>);
+<span class="pl-k">xlswrite</span>(<span class="pl-s"><span class="pl-pds">'</span>Data.xlsx<span class="pl-pds">'</span></span>,G.Edges.Link_Name,<span class="pl-s"><span class="pl-pds">'</span>Traffic Link<span class="pl-pds">'</span></span>,<span class="pl-s"><span class="pl-pds">'</span>D2<span class="pl-pds">'</span></span>);</pre></div>
+
+<h3>
+<a id="modeling-the-integer-programming-model-in-lingo" class="anchor" href="#modeling-the-integer-programming-model-in-lingo" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Modeling the Integer Programming Model in Lingo</h3>
+
+<pre lang="lingo"><code>Model:
+Title  An Evacuation Traffic Management Problem;
+Sets: 
+    Node: Node_Capacity;
+    Link: Link_Capacity,Travel_Time,flow;
+    IncidenceMatrix(Node,Link):A;
+    Vulnerable_Links(Link): retrofit,Cost;
+Endsets 
+
+! Read data;
+Data:
+Node,Link,Vulnerable_Links,
+Node_Capacity,Link_Capacity,Travel_Time,
+A,Budget,Cost=@OLE('Data.xlsx');
+EndData
+
+! Objective;
+[Total_Travel_Time] min=@SUM(Link(i):Travel_Time(i)*flow(i)); 
+
+! Constraint 0: integer constraint;
+@FOR(Link(i): [int_constraint] @GIN(flow(i))) ;
+@FOR(Vulnerable_Links(i): [binary_int_constraint] @BIN( retrofit(i))); 
+[bidirection_retrofit1]retrofit(l_8_9)=retrofit(l_9_8);
+[bidirection_retrofit2]retrofit(l_10_14)=retrofit(l_14_10);
+[bidirection_retrofit3]retrofit(l_11_12)=retrofit(l_12_11);
+[bidirection_retrofit4]retrofit(l_14_19)=retrofit(l_19_14);
+[bidirection_retrofit5]retrofit(l_19_20)=retrofit(l_20_19);
+
+! Constraint 1: Link Reserve Capacity Constraint;
+@For(Link(i):[link_reserve_capacity] flow(i) &lt;= Link_Capacity(i)); 
+@For(Vulnerable_Links(i):[vulnerable_link_capacity] 
+    flow(i) &lt;= retrofit(i) * Link_Capacity(i));  
+
+! Constraint 2: Flow Conservation;
+@For(Node(i)|Node_Capacity(i)#LT# 0: [source_conservation] 
+    @Sum(Link(j): A(i,j)*flow(j)) =   Node_Capacity(i) );
+@For(Node(i)|Node_Capacity(i)#GT# 0: [sink_conservation]
+    @Sum(Link(j):  A(i,j)*flow(j))&lt;= Node_Capacity(i) );
+@For(Node(i)|Node_Capacity(i)#GT# 0: [sink_lowerbound]
+    @Sum(Link(j):  A(i,j)*flow(j))&gt;= 0 );
+@For(Node(i)|Node_Capacity(i)#EQ# 0: [internal_nodes_flow_conservation]
+    @Sum(Link(j):  A(i,j)*flow(j))= 0 );
+
+! Constraint 3: Budget Constraint;
+[Budget_Constraint] @Sum(Vulnerable_Links(i): 
+    retrofit(i)*Cost(i)) &lt;= Budget;
+
+! Output results;
+Data:
+@OLE('Data.xlsx')=flow,retrofit;
+Enddata
+End
+</code></pre>
+
+<h3>
+<a id="visualizing-the-results" class="anchor" href="#visualizing-the-results" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Visualizing the Results</h3>
+
+<p><img src="https://liutongzhou.github.io/Interesting-Problems/An-Evacuation-Traffic-Management-Problem/Evacuation_Plan.png" alt="The Optimal Evacuation Plan"></p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/LiutongZhou/An-Evacuation-Tra-c-Management-Problem">An Evacuation Plan for San Francisco</a> is maintained by <a href="https://github.com/LiutongZhou">LiutongZhou</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
