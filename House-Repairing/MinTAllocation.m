@@ -12,21 +12,23 @@ lb=zeros(size(S0));%lower bound of S
 ub=repmat(M',1,r+1);%upper bound of S as shown in constraint 1
 A=ones(1,n);A=kron(eye(r+1),A);%inequality constraint A*S<=b as shown in constraint 1
 b=X*ones(r+1,1);%inequality constraint A*S<=b as shown in constraint 1
+
 list=find(index>1);% construct a list of row_index of S which corresponds to the delayed row_index-th task by R
 % so that S(i,1:index-1) must equal to zero
 for i=list
     m=sum(index(i)-1);%m is total number of linear inequality constraints described in constraint 2
 end
-sub=zeros(m,2);z=length(list);j=1;% ³õÊ¼»¯ÏÂ±êË÷ÒısubÓÃÓÚ´æ´¢constraint 2 ÖĞSµÄÏÂ±ê£¬
-%sub(£º,1)£¬sub(:,2)¶ÔÓ¦constraint 2 ÖĞËùÓĞS(i,j) µÄÏÂ±ê(i,j)
-for i=1:z % sub ´æ´¢ÁË constraint 2 ÖĞSµÄÏÂ±ê 
+sub=zeros(m,2);z=length(list);j=1;% åˆå§‹åŒ–ä¸‹æ ‡ç´¢å¼•subç”¨äºå­˜å‚¨constraint 2 ä¸­Sçš„ä¸‹æ ‡ï¼Œ
+%sub(ï¼š,1)ï¼Œsub(:,2)å¯¹åº”constraint 2 ä¸­æ‰€æœ‰S(i,j) çš„ä¸‹æ ‡(i,j)
+for i=1:z % sub å­˜å‚¨äº† constraint 2 ä¸­Sçš„ä¸‹æ ‡ 
     sub(j:j+index(list(i))-1-1,2)=1:index(list(i))-1;
     sub(j:j+index(list(i))-1-1,1)=list(i);%list(i) is the row number of S that needs to be set constraint 2
     j=j+index(list(i))-1;
 end
-j=sub2ind(size(S0), sub(:,1), sub(:,2));%ÏÂ±ê×ª»¯ÎªÏßĞÔË÷Òı
-Aeq=sparse(1:m,j,ones(m,1),m,n*(r+1));%¹¹½¨ÏßĞÔµÈÊ½Ô¼Êøconstriant 2 ÖĞµÄAeq
+j=sub2ind(size(S0), sub(:,1), sub(:,2));%ä¸‹æ ‡è½¬åŒ–ä¸ºçº¿æ€§ç´¢å¼•
+Aeq=sparse(1:m,j,ones(m,1),m,n*(r+1));%æ„å»ºçº¿æ€§ç­‰å¼çº¦æŸconstriant 2 ä¸­çš„Aeq
 beq=sparse(m,1);
-[S,~,deltaT]=fminimax(maxgoal,S0,A,b,Aeq,beq,lb,ub);%ÓÃÓÅ»¯Çó½âÆ÷Çó½âÄ£ĞÍ
-TotalTime=sum([dt,deltaT]);%Êä³ö½á¹û
+
+[S,~,deltaT]=fminimax(maxgoal,S0,A,b,Aeq,beq,lb,ub);%ç”¨ä¼˜åŒ–æ±‚è§£å™¨æ±‚è§£æ¨¡å‹
+TotalTime=sum([dt,deltaT]);%è¾“å‡ºç»“æœ
 end
